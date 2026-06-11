@@ -5,7 +5,7 @@ A RAG-based chat application that lets you upload documents (PDF, Word, Excel, C
 ## Table of Contents
 
 - [Features](#features)
-- [Screenshots / UI Walkthrough](#screenshots--ui-walkthrough)
+- [Screenshots](#screenshots)
 - [Setup](#setup)
 - [Architecture](#architecture)
 - [API Reference](#api-reference)
@@ -29,168 +29,77 @@ A RAG-based chat application that lets you upload documents (PDF, Word, Excel, C
 
 ---
 
-## Screenshots / UI Walkthrough
+## Screenshots
 
-### Main Layout
+### 1. Main Page — Upload, Modes, Document List
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  📚 BookChat                    Chat with books, docs & papers     │
-│                                  qwen3:14b                          │
-├──────────────┬──────────────────────────────────────────────────────┤
-│ UPLOAD       │                                                      │
-│ DOCUMENT     │  📖 Welcome to BookChat                              │
-│              │                                                      │
-│ 📄 Drop file │  Upload any document — PDF, Word, Excel, CSV,       │
-│ or click to  │  JSON, HTML, EPUB, images — then chat with it.      │
-│ upload       │  The AI mediator rewrites your questions, resolves   │
-│              │  follow-up references, decomposes complex queries,   │
-│ PDF · TXT ·  │  and proactively surfaces insights.                 │
-│ MD · DOCX ·  │                                                      │
-│ CSV · JSON   │  🔍 Query Rewriting    🧠 Multi-Step Reasoning      │
-│              │  💡 Proactive Insights  💬 Follow-Up Suggestions     │
-│              │  📎 Source Citations   🔮 Predictions               │
-├──────────────┤                                                      │
-│ MODE         │                                                      │
-│              │                                                      │
-│ 💬 Answer    │                                                      │
-│ 🔍 Analyze   │                                                      │
-│ 🔮 Predict   │                                                      │
-│ 📝 Summarize │                                                      │
-├──────────────┼──────────────────────────────────────────────────────┤
-│ DOCUMENTS    │  Status: Upload a document to begin                  │
-│ [All Docs]   │                                                      │
-│              │  ┌─────────────────────────────────────────────┐     │
-│ 📄 doc1.pdf  │  │ Ask a question about your document...       │     │
-│ 108 chunks   │  │                                          ➤  │     │
-│ 75,991 chars │  └─────────────────────────────────────────────┘     │
-│              │                                                      │
-│ 📄 doc2.txt  │                                                      │
-│ 477 chunks   │                                                      │
-│ 332,148 chars│                                                      │
-└──────────────┴──────────────────────────────────────────────────────┘
-```
+![Main Page](docs/screenshots/01_main_page.png)
 
-### Step 1 — Upload Documents
+The main interface shows:
+- **Header** — App name + current Ollama model badge
+- **Upload zone** — Drag-and-drop or click to upload (supports 21 formats)
+- **Mode selector** — Answer / Analyze / Predict / Summarize
+- **Document list** — All uploaded files with chunk/char counts + "All Docs" button
+- **Chat area** — Welcome message with feature highlights
+- **Input area** — Question textbox + send button
+- **Status bar** — Current connection status
 
-Click the upload zone or drag-and-drop a file. Supported formats: PDF, TXT, MD, DOCX, CSV, JSON, XLSX, HTML, XML, EPUB, RTF, PNG, JPG, JPEG, TIFF, BMP, WebP.
+### 2. Upload Zone
 
-```
-┌──────────────────────────┐
-│  📄                      │
-│  Drop file or click      │
-│  to upload               │
-│                          │
-│  PDF · TXT · MD · DOCX   │
-│  CSV · JSON · XLSX · ... │
-└──────────────────────────┘
-         │
-         ▼  After upload
-┌──────────────────────────┐
-│  ✅                      │
-│  'doc.pdf' ingested     │
-│  (108 chunks)            │
-└──────────────────────────┘
-```
+![Upload Zone](docs/screenshots/02_upload_zone.png)
 
-The document is automatically selected and appears in the sidebar with chunk count and character count.
+Hover effect on the upload zone. Click to open file picker or drag-and-drop any supported document format (PDF, TXT, MD, DOCX, CSV, JSON, XLSX, HTML, XML, EPUB, RTF, PNG, JPG, JPEG, TIFF, BMP, WebP).
 
-### Step 2 — Select Chat Mode
+### 3. Document Selected
 
-Four modes available in the sidebar:
+![Document Selected](docs/screenshots/03_doc_selected.png)
 
-| Mode | Icon | When to Use |
-|------|------|-------------|
-| **Answer** | 💬 | Factual questions — "What does the document say about X?" |
-| **Analyze** | 🔍 | Deep analysis — themes, patterns, relationships |
-| **Predict** | 🔮 | Predictions — "What might happen if trends continue?" |
-| **Summarize** | 📝 | Get a comprehensive summary of the document |
+After clicking a document in the sidebar:
+- Document becomes highlighted (active state)
+- Chat title updates to show the filename
+- Send button becomes enabled
+- Status bar shows "Chatting with: <filename>"
+- Green status dot indicates active connection
+- Clear Chat button appears
 
-### Step 3 — Select Document or All Documents
+### 4. Typed Question
 
-- **Single document**: Click any document name in the sidebar. The chat title updates to show that document's name.
-- **All documents**: Click the "All Docs" button next to the Documents heading. A "Multi-doc mode" badge appears. Queries will search across ALL uploaded documents.
+![Typed Question](docs/screenshots/04_typed_question.png)
 
-### Step 4 — Chat
+Type any question in the input box. The text auto-resizes for multi-line input. Press Enter or click the send button to submit.
 
-Type your question and press Enter or click the send button.
+### 5. Chat Response
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  📄 art_of_war.txt                              [Clear Chat] │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│  👤 What does Sun Tzu say about deception?                   │
-│                                                              │
-│  🤖 🔍 Searching: What does Sun Tzu say about deception?    │
-│                                                              │
-│  Sun Tzu emphasizes deception as a foundational element      │
-│  of warfare:                                                 │
-│                                                              │
-│  1. "All warfare is based on deception" (Passage 1)          │
-│  2. Feigning weakness to mislead the enemy (Passage 1)       │
-│  3. Appearing inactive when ready to attack (Passage 2)      │
-│                                                              │
-│  📎 5 source passage(s)                                      │
-│  #1 (score: 0.3379) — All warfare is based on deception...  │
-│  #2 (score: 0.3928) — when able to attack, seem unable...   │
-│  #3 (score: 0.3953) — hold out baits to entice the enemy... │
-│                                                              │
-│  💡 Insight: Sun Tzu's deception principles extend beyond    │
-│  warfare into business strategy and competitive dynamics...  │
-│                                                              │
-│  [How does deception apply to modern warfare?]               │
-│  [What other principles complement deception?]               │
-│  [Compare Sun Tzu's view with Clausewitz on deception]       │
-│                                                              │
-├──────────────────────────────────────────────────────────────┤
-│  Status: Chatting with: art_of_war.txt                       │
-│  ┌─────────────────────────────────────────────┐  ➤         │
-│  │ Ask a question about your document...       │             │
-│  └─────────────────────────────────────────────┘             │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### Response Features
+![Chat Response](docs/screenshots/05_chat_response.png)
 
 Each response includes:
-- **Rewritten query** — shows how the AI reformulated your question for better search
-- **Answer** — grounded in document passages with citations
-- **Source passages** — expandable list of retrieved chunks with relevance scores
-- **Proactive insight** — every 4th turn, an interesting observation not explicitly asked
+- **Rewritten query** (🔍) — Shows how the AI reformulated your question
+- **Answer** — Grounded response with inline citations
+- **Source passages** (📎) — Expandable list of retrieved chunks with relevance scores
+- **Proactive insight** (💡) — Every 4turns, an interesting observation
 - **Follow-up suggestions** — 3 clickable questions to continue the conversation
 
-### Multi-Document Chat
+### 6. All Documents Mode
 
-When "All Docs" mode is active:
+![All Docs Mode](docs/screenshots/06_all_docs_mode.png)
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  📚 All Documents              [Multi-doc mode]  [Clear]     │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│  👤 What are the main themes across all documents?           │
-│                                                              │
-│  🤖 The main themes across the documents are:                │
-│                                                              │
-│  1. Military Writing Style (Passages 1, 2, 5)                │
-│     [art_of_war.txt] Emphasis on neutral, direct language    │
-│     [Military-Guide.pdf] Guidance on structuring briefs      │
-│                                                              │
-│  2. Strategic Thinking (Passages 3, 4)                       │
-│     [art_of_war.txt] Deception as foundational element       │
-│     [on_war.txt] Clausewitz on friction and uncertainty      │
-│                                                              │
-│  📎 8 source passage(s)                                      │
-│  #1 (score: 0.2847) — All warfare is based on... [art_of...] │
-│  #2 (score: 0.3156) — The purpose of a brief is to... [Mi...]│
-│                                                              │
-├──────────────────────────────────────────────────────────────┤
-│  Status: Chatting with all documents                         │
-└──────────────────────────────────────────────────────────────┘
-```
+Click "All Docs" to enable multi-document chat:
+- Title changes to "📚 All Documents"
+- Purple "Multi-doc mode" badge appears in the header
+- Queries search across ALL uploaded documents simultaneously
+- Source citations show document ID prefixes for cross-referencing
 
-Source citations show document ID prefixes so you know which document each passage came from.
+### 7. Mode Selector
+
+![Mode Selector](docs/screenshots/07_mode_selector.png)
+
+Four modes available:
+| Mode | Icon | Purpose |
+|------|------|---------|
+| **Answer** | 💬 | Factual Q&A with citations |
+| **Analyze** | 🔍 | Deep thematic analysis |
+| **Predict** | 🔮 | Strategic predictions |
+| **Summarize** | 📝 | Comprehensive summaries |
 
 ---
 
@@ -258,6 +167,8 @@ bookchat/
 ├── mediator.py         # AI mediator — query rewrite, multi-step reasoning,
                        #   follow-up suggestions, proactive insights, multi-doc chat
 ├── requirements.txt    # Python dependencies
+├── docs/
+│   └── screenshots/    # UI screenshots for documentation
 ├── templates/
 │   └── index.html      # Chat UI — dark theme, drag-and-drop, multi-doc selector
 ├── samples/            # Sample test documents (14 files)
@@ -428,6 +339,8 @@ Chat with a document or across all documents.
   "filename": "report.pdf"
 }
 ```
+
+**Multi-doc response** includes `"doc_ids": ["id1", "id2", ...]` instead of single `doc_id`.
 
 **Response (400):**
 ```json
