@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+stores/
+stores_test/
+uploads/
+doc_registry.json
+*.sqlite3
+.env
